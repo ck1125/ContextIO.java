@@ -379,7 +379,7 @@ public class ContextIO {
 	/**
 	 * Specify whether or not API calls should be made over a secure connection. 
 	 * HTTPS is used on all calls by default.
-	 * @param sslOn Set to false to make calls over HTTP, true to use HTTPS
+	 * @param ssl Set to false to make calls over HTTP, true to use HTTPS
 	 */
 	public void setSsl(boolean ssl) {
 		this.ssl = ssl;
@@ -405,7 +405,7 @@ public class ContextIO {
 	/**
 	 * Specify whether OAuth parameters should be included as URL query parameters
 	 * or sent as HTTP Authorization headers. The default is URL query parameters.
-	 * @param authHeadersOn Set to true to use HTTP Authorization headers, false to use URL query params
+	 * @param authHeaders Set to true to use HTTP Authorization headers, false to use URL query params
 	 */
 	public void setAuthHeaders(boolean authHeaders) {
 		this.authHeaders = authHeaders;
@@ -471,7 +471,7 @@ public class ContextIO {
 			baseUrl = URLUtils.appendParametersToQueryString(baseUrl, params);
 		}
 
-		OAuthService service = new ServiceBuilder().provider(ContextIOApi.class).apiKey("ptj7pndz").apiSecret("QJnoEhwcdpmwNznA").build();
+		OAuthService service = new ServiceBuilder().provider(ContextIOApi.class).apiKey(key).apiSecret(secret).build();
 		OAuthRequest request = new OAuthRequest(Verb.GET, baseUrl);
 		
 		Token nullToken = new Token("", "");
