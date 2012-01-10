@@ -1,2 +1,10 @@
 bin/*
 gen/*
+.classpath
+.project
+build
+*.ipr
+*.iws
+*.iml
+.gradle
+libs
