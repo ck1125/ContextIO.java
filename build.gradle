@@ -1,0 +1,108 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+}
+
+apply plugin: "project-reports"
+apply plugin: "idea"
+apply plugin: "java"
+apply plugin: "maven"
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
+version = "0.1-SNAPSHOT"
+repositories {
+    mavenLocal()
+    mavenCentral()
+	mavenRepo name: "gson", urls: ["http://google-gson.googlecode.com/svn/mavenrepo"]
+
+}
+
+
+configure(install.repositories.mavenInstaller) {
+    pom.artifactId = 'context-io-java'
+	pom.groupId = 'io.context'
+}
+
+
+dependencies {
+
+    compile "commons-codec:commons-codec:1.5"
+    compile "com.google.code.gson:gson:1.7.1"
+    compile "org.scribe:scribe:1.2.1"
+
+
+}
+
+
+private def getCompileDependencies() {
+    def depList = []
+    configurations.compile.resolvedConfiguration.resolvedArtifacts.each {
+        if (!depList.contains(it.resolvedDependency.name)) {
+            depList.add([name: it.resolvedDependency.name, file: it.file])
+        }
+    }
+    return depList
+}
+
+
+
+
+ideaProject {
+    withXml { provider ->
+        def libraryTable = provider.node.component.orderEntry.find {it.@type == 'libraryTable'}
+        def compileDependencies = getCompileDependencies()
+        compileDependencies.each { dependency ->
+
+            def inXml = libraryTable?.find { it.library.@name == "${dependency.name}"}
+            if (!inXml) {
+                if (!libraryTable) {
+                    libraryTable = provider.node.appendNode('component', [name: 'libraryTable'])
+                }
+                def newLibrary = libraryTable.appendNode('library', [name: "${dependency.name}"])
+                def classNode = newLibrary.appendNode('CLASSES')
+                classNode.appendNode('root', [url: "jar:///${dependency.file}!/"])
+                newLibrary.appendNode('JAVADOC')
+                newLibrary.appendNode('SOURCES')
+            }
+
+            provider.node.component.find { it.@name == 'ProjectRootManager' }.@languageLevel = 'JDK_1_6'
+            provider.node.component.find { it.@name == 'ProjectRootManager' }.@'project-jdk-name' = '1.6'
+            provider.node.component.find { it.@name == 'VcsDirectoryMappings' }.mapping.@vcs = "Git"
+
+        }
+    }
+}
+
+
+ideaModule {
+    withXml { provider ->
+        def component = provider.node.component.find {it.@name == "NewModuleRootManager" }
+
+        def compileDependencies = getCompileDependencies()
+        compileDependencies.each { dependency ->
+
+            def inXml = component.orderEntry?.find { it.@name == "${dependency.name}"}
+            if (!inXml) {
+                orderEntry = component.appendNode('orderEntry', [type: 'library', name: "${dependency.name}", level: "project"])
+            }
+
+
+        }
+        def content = component.content
+        if (content) {
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/test/unit',isTestSource:"true"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/test/integration',isTestSource:"true"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/grails-app/domain',isTestSource:"false"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/grails-app/controllers',isTestSource:"false"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/grails-app/service',isTestSource:"false"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/grails-app/conf',isTestSource:"false"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/src/groovy',isTestSource:"false"])
+            content.add(sourceFolder:[sourceFolder:'file://\$MODULE_DIR\$/src/java',isTestSource:"false"])
+        }
+
+    }
+}
+
