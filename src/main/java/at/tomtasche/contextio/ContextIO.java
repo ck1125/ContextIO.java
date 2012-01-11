@@ -1,19 +1,20 @@
 package at.tomtasche.contextio;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.scribe.builder.ServiceBuilder;
 import org.scribe.model.OAuthRequest;
+import org.scribe.model.ParameterList;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
 import org.scribe.model.Verb;
 import org.scribe.oauth.OAuthService;
-import org.scribe.utils.URLUtils;
+
+import java.util.HashMap;
+import java.util.Map;
+
 
 /**
  * Class to manage Context.IO API access
- * 
+ *
  * @author Thomas Taschauer | tomtasche.at
  */
 public class ContextIO {
@@ -143,7 +144,7 @@ public class ContextIO {
 	 * Returns the content a given attachment. If you want to save the attachment to
 	 * a file, set $saveAs to the destination file name. If $saveAs is left to null,
 	 * the function will return the file data.
-	 * on the 
+	 * on the
 	 * @link http://context.io/docs/1.1/downloadfile
 	 * @param account accountId or email address of the mailbox you want to query
 	 * @param params Query parameters for the API call: 'fileId'
@@ -153,7 +154,7 @@ public class ContextIO {
 	// TODO: public function downloadFile(String account, Map<String, String> params, File saveAs) {
 
 	/**
-	 * Returns a list of revisions attached to other emails in the 
+	 * Returns a list of revisions attached to other emails in the
 	 * mailbox for one or more given files (see fileid parameter below).
 	 * @link http://context.io/docs/1.1/filerevisions
 	 * @param account accountId or email address of the mailbox you want to query
@@ -167,7 +168,7 @@ public class ContextIO {
 	}
 
 	/**
-	 * Returns a list of files that are related to the given file. 
+	 * Returns a list of files that are related to the given file.
 	 * Currently, relation between files is based on how similar their names are.
 	 * You must specify either the fileId of fileName parameter
 	 * @link http://context.io/docs/1.1/relatedfiles
@@ -182,7 +183,7 @@ public class ContextIO {
 	}
 
 	/**
-	 * 
+	 *
 	 * @link http://context.io/docs/1.1/filesearch
 	 * @param account accountId or email address of the mailbox you want to query
 	 * @param params Query parameters for the API call: 'fileName'
@@ -253,8 +254,8 @@ public class ContextIO {
 	}
 
 	/**
-	 * When Context.IO can't connect to your IMAP server, 
-	 * the IMAP server gets flagged as unavailable in our database. 
+	 * When Context.IO can't connect to your IMAP server,
+	 * the IMAP server gets flagged as unavailable in our database.
 	 * Use this call to re-enable the syncing.
 	 * @link http://context.io/docs/1.1/imap/resetstatus
 	 * @return ContextIOResponse
@@ -377,7 +378,7 @@ public class ContextIO {
 	}
 
 	/**
-	 * Specify whether or not API calls should be made over a secure connection. 
+	 * Specify whether or not API calls should be made over a secure connection.
 	 * HTTPS is used on all calls by default.
 	 * @param ssl Set to false to make calls over HTTP, true to use HTTPS
 	 */
@@ -468,12 +469,12 @@ public class ContextIO {
 
 		String baseUrl = build_url(action);
 		if ("GET".equals(method)) {
-			baseUrl = URLUtils.appendParametersToQueryString(baseUrl, params);
+            baseUrl = new ParameterList(params).appendTo(baseUrl);
 		}
 
-		OAuthService service = new ServiceBuilder().provider(ContextIOApi.class).apiKey(key).apiSecret(secret).build();
+		OAuthService service = new ServiceBuilder().provider(ContextIOApi.class).apiKey(key).apiSecret(secret).debugStream(System.out).build();
 		OAuthRequest request = new OAuthRequest(Verb.GET, baseUrl);
-		
+
 		Token nullToken = new Token("", "");
 		service.signRequest(nullToken, request);
 

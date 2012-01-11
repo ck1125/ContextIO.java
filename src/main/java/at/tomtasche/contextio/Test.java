@@ -11,11 +11,12 @@ import java.util.Map;
 public class Test {
 
 	public static void main(String[] args) {
-		ContextIO dokdok = new ContextIO("vt9cuif4", "CtGBnwzZdHukmcEt");
+		ContextIOV2 dokdok = new ContextIOV2("YOUR API KEY", "YOUR SECRET");
 		
 		Map<String, String> params = new HashMap<String, String>();
-		params.put("since", "0");
-		
-		System.out.println(dokdok.allMessages("cezeugoh@gmail.com", params).rawResponse.getBody());
+//		params.put("since", "0");
+		params.put("limit", "1");
+
+		System.out.println(dokdok.getMessages("YOUR ACCOUNT ID", params).rawResponse.getBody());
 	}
 }
